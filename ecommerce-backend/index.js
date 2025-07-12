@@ -5,6 +5,7 @@ import connectDB from "./database/db.js"; // Importamos la función de conexión
 import productRoutes from "./routes/products.routes.js";
 import userRoutes from "./routes/user.routes.js"; // 1. Importa las rutas de usuario
 import categoryRoutes from "./routes/category.routes.js";
+import brandRoutes from "./routes/brand.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import summaryRoutes from "./routes/summary.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
@@ -28,6 +29,7 @@ const PORT = 4000;
 app.use("/api/products", productRoutes); // rutas de los productos
 app.use("/api/users", userRoutes); // 2. Usa las rutas de usuario
 app.use("/api/categories", categoryRoutes); // rutas para las categorias de productos
+app.use("/api/brands", brandRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/summary", summaryRoutes);
 app.use("/api/upload", uploadRoutes);

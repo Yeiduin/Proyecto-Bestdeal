@@ -4,6 +4,7 @@ import { NavLink, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import useAuthStore from '../stores/authStore';
 import useCartStore from '../stores/cartStore';
+import { FaUserCircle } from 'react-icons/fa'; // Importamos el ícono de usuario
 
 function Header() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -44,6 +45,16 @@ function Header() {
     setMobileMenuOpen(false);
     navigate('/');
   };
+  
+  // --- NUEVA LÓGICA DEL BOTÓN DE USUARIO ---
+  const handleUserIconClick = () => {
+    if (user) {
+      setUserMenuOpen(!isUserMenuOpen); // Si hay usuario, abre/cierra el menú
+    } else {
+      navigate('/login'); // Si no hay usuario, va a la página de login
+    }
+  };
+
 
   // Clases reutilizables para los enlaces
   const baseLinkClasses = "text-gray-300 hover:text-emerald-400 transition-colors py-3";
@@ -75,7 +86,6 @@ function Header() {
             <div className="flex items-center ml-auto">
                 <nav className="flex items-center space-x-6">
                     <NavLink to="/" className={({ isActive }) => isActive ? activeLinkClasses : baseLinkClasses}>Inicio</NavLink>
-                    {/* RESTAURADO: Menú desplegable de Productos */}
                     <div className="relative group">
                         <NavLink to="/tienda" className={({ isActive }) => isActive ? activeLinkClasses : baseLinkClasses}>
                             <div className="flex items-center">Productos <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" /></svg></div>
@@ -92,31 +102,30 @@ function Header() {
                     <NavLink to="/contacto" className={({ isActive }) => isActive ? activeLinkClasses : baseLinkClasses}>Contacto</NavLink>
                 </nav>
                 <div className="flex items-center pl-6 space-x-4">
-                    {/* RESTAURADO: Sección de usuario y carrito */}
-                    {user ? (
-                        <div className="relative">
-                            <button onClick={() => setUserMenuOpen(!isUserMenuOpen)} className="flex items-center space-x-2 text-gray-300 hover:text-white">
-                                <span>Hola, {user.name.split(' ')[0]}</span>
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" /></svg>
-                            </button>
-                            {isUserMenuOpen && (
-                                <div className="absolute top-full right-0 mt-2 w-56 bg-slate-700 rounded-md shadow-lg py-2 z-20" onMouseLeave={() => setUserMenuOpen(false)}>
-                                    <div className="px-4 py-2 border-b border-slate-600">
-                                        <p className="text-sm font-semibold text-white">{user.name}</p>
-                                        <p className="text-xs text-gray-400 truncate">{user.email}</p>
-                                    </div>
-                                    <Link to="/perfil" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-200 hover:bg-emerald-500 hover:text-white">Mi Perfil</Link>
-                                    {user.role === 'admin' && (
-                                        <Link to="/admin" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-200 hover:bg-emerald-500 hover:text-white">Panel de Admin</Link>
-                                    )}
-                                    <hr className="border-slate-600 my-1"/>
-                                    <button onClick={handleLogout} className="w-full text-left block px-4 py-2 text-sm text-red-400 hover:bg-red-500 hover:text-white">Cerrar Sesión</button>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <NavLink to="/login" className="text-gray-300 hover:text-white" title="Iniciar Sesión / Registro"><svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></NavLink>
-                    )}
+                    {/* --- SECCIÓN DE USUARIO Y CARRITO MODIFICADA --- */}
+                    <div className="relative">
+                      <button onClick={handleUserIconClick} className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
+                        <FaUserCircle className={`h-6 w-6 ${user ? 'text-emerald-400' : 'text-gray-500'}`} />
+                        {user && <span>Hola, {user.name.split(' ')[0]}</span>}
+                      </button>
+                      
+                      {/* El menú desplegable solo se muestra si hay un usuario y está abierto */}
+                      {user && isUserMenuOpen && (
+                          <div className="absolute top-full right-0 mt-2 w-56 bg-slate-700 rounded-md shadow-lg py-2 z-20" onMouseLeave={() => setUserMenuOpen(false)}>
+                              <div className="px-4 py-2 border-b border-slate-600">
+                                  <p className="text-sm font-semibold text-white">{user.name}</p>
+                                  <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                              </div>
+                              <Link to="/perfil" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-200 hover:bg-emerald-500 hover:text-white">Mi Perfil</Link>
+                              {user.role === 'admin' && (
+                                  <Link to="/admin" onClick={() => setUserMenuOpen(false)} className="block px-4 py-2 text-sm text-gray-200 hover:bg-emerald-500 hover:text-white">Panel de Admin</Link>
+                              )}
+                              <hr className="border-slate-600 my-1"/>
+                              <button onClick={handleLogout} className="w-full text-left block px-4 py-2 text-sm text-red-400 hover:bg-red-500 hover:text-white">Cerrar Sesión</button>
+                          </div>
+                      )}
+                    </div>
+                    
                     <Link to="/carrito" className="text-gray-300 hover:text-white relative">
                         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4z" /></svg>
                         {totalItemsInCart > 0 && (<span className="absolute -top-2 -right-2 bg-emerald-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{totalItemsInCart}</span>)}
